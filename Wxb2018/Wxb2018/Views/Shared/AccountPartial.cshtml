@@ -1,0 +1,153 @@
+﻿@{
+    Layout = null;
+}
+<!-- 登录弹窗 -->
+<div class="denglu-box center-1" style="display:none;" id="login-Div">
+    <div class="enter-2">
+        <div class="title-close">登录<a class="closeBtn"></a></div>
+        <form>
+            <div class="error" id="lg-error">密码输入错误，请重新输入。</div>
+            <ul>
+                <li><input id="lg-userName" autocomplete="off" class="text-2" name="textfield" type="text" placeholder="请输入客户编号或手机号" value="" /></li>
+                <li><input id="lg-password" type="password" placeholder="请输入登录密码" class="password-2" /></li>
+                <li class="ckbox" style="display:none;"><label><input id="lg-rememberMe" type="checkbox" /><em>记住密码</em></label></li>
+            </ul>
+            <div class="denglu-but"><a class="error-btn" id="lg-btn" href="javascript:void(0);">登录</a></div>
+        </form>
+        @*<div class="closeBtn"></div>*@
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    $(function () {
+
+        var regex = {
+            phone: "^(0|86|17951)?1[0-9]{10}$",
+            password: "^[0-9a-zA-Z]{6,16}$",
+            code: "^[0-9a-zA-Z]{1,20}$",
+            danger: "</?[a-zA-Z0-9]+>",
+            postCode: "^[1-9][0-9]{5}$",
+            number: '^\\d+$',
+            integer: '^[-\\+]?\\d+$',
+            double: '^[-\\+]?\\d+(\\.\\d+)?$',
+            verCode: "^[0-9]{6}$"
+        };
+
+        // 列表界面'登录'
+        $('.denglu').on('click', function () {
+            alertLoginWin();
+        });
+
+        //登录弹窗
+        function alertLoginWin() {
+
+            if ($('.denglu-box').attr('data-opening') == '1') {
+                return;
+            }
+
+            var options = $.extend({ closeBtn: true, shade: 0.3 }, window.layerOptions || {});
+            layer.open({
+                title: false,
+                type: 1,
+                skin: 'login-layer',
+                area: ['400px', '290px'],
+                closeBtn: false,
+                shade: options.shade,
+                move: false,
+                content: $('.denglu-box'),
+                success: function (layero, index) {
+
+                    $('.denglu-box').find('.closeBtn').data('dengluindex', index);
+                    if (!options.closeBtn) {
+                        $('.denglu-box').find('.closeBtn').hide();
+                    }
+                    $(document.body).attr('data-opening', '1');
+                }
+            });
+        }
+
+        //关闭登录弹窗
+        $('.closeBtn').on('click', function () {
+
+            var denglu_index = $(this).data('dengluindex')
+            layer.close(denglu_index);
+            $(document.body).attr('data-opening', '0');
+        });
+
+        //dialog界面'登录'
+        $("#lg-btn").on("click", function () {
+
+            hideTip();
+
+            var user = vaildUser();
+            if (!user) return;
+
+            showTip("登入中...");
+
+            var loginUrl = '@(Url.Action("Login","Account"))';
+            $.post(loginUrl, user, function (data) {
+
+                if (data.Code == 200) {
+
+                    //刷新界面
+                    location.href = '@Url.Content("~/")';
+                    //关闭dialog
+                    var denglu_index = $("#lg-btn").data('dengluindex')
+                    layer.close(denglu_index);
+
+                } else {
+                    showTip(data.Msg);
+                }
+            });
+        });
+
+        $(document).on("keydown", function (e) {
+            if (e.keyCode == 13) {
+                if ($("#login-Div").css("display") == "block") {
+                    $("#lg-btn").click();
+                } else {
+                    $("#reg-btn").click();
+                }
+            }
+        });
+
+        //判断用户输入信息
+        function vaildUser() {
+
+            var UserName = $.trim($("#lg-userName").val());
+            //if (!(new RegExp(regex.phone).test(UserName) || /^[a-zA-Z0-9_\.\u4e00-\u9fa5]{2,25}$/.test(UserName))) {
+            //    showTip("请输入正确的客户编号或手机号！");
+            //    return null;
+            //}
+
+            var password = $.trim($("#lg-password").val());
+            //if (!new RegExp(regex.password).test(password)) {
+            //    showTip("密码由6-16位数字或字母组成，请重新输入！");
+            //    return null;
+            //}
+
+            return {
+                userName: UserName,
+                password: password,
+                isRememberPwd: !!$("#lg-rememberMe:checked")[0]
+            };
+        }
+
+        function showTip(msg, success) {
+            if (success) {
+
+            } else {
+                $("#lg-error").show().text(msg);
+            }
+        }
+
+        function hideTip() {
+            $("#lg-error").hide();
+        }
+
+        $.alertLoginWin = alertLoginWin;
+        window.alertLoginWin = alertLoginWin;
+    });
+
+</script>

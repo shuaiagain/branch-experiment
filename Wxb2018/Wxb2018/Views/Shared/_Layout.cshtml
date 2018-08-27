@@ -1,0 +1,127 @@
+﻿@using WXB.Bussiness.Common
+@{
+    var isLogin = Request.IsAuthenticated;
+    WFFormPrincipal loginUser = User as WFFormPrincipal;
+    WFFormsAuthentication userInfo = loginUser == null ? new WFFormsAuthentication() : loginUser.UserData;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta charset="utf-8" />
+    <title>@ViewBag.Title</title>
+    <link href="~/content/css/common.css" rel="stylesheet" type="text/css" />
+    <link href="~/content/css/base.css" rel="stylesheet" type="text/css" />
+    <link href="~/content/iconfont/iconfont.css" rel="stylesheet" type="text/css" />
+    <link href="~/content/plugins/pagination/pagination.css" rel="stylesheet" type="text/css" />
+    @RenderSection("head", false)
+
+    <script type="text/javascript" src="~/Content/plugins/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="~/Content/plugins/layer/layer.js"></script>
+    <script type="text/javascript" src="~/Content/plugins/laydate/laydate.js"></script>
+    <script type="text/javascript" src="~/Content/plugins/pagination/jquery.pagination.js"></script>
+</head>
+<body>
+
+    <!--登录成功头部-->
+    <div id="accountDiv"></div>
+    <!--响应状态编辑-->
+    <div id="responseDiv">
+        <div class="rp-title"><span class="title-text">响应状态编辑</span></div>
+        <div class="rp-content"></div>
+        <div class="rp-footer">
+            <span class="btn-save saveResponse">保存</span>
+            <span class="btn-cancel cancelResponse">取消</span>
+        </div>
+    </div>
+
+    <div class="topBar">
+        <div class="mCon">
+            <div class="topcon clearfix">
+
+                @if (isLogin && userInfo.Flag == (int)EnumIsAdmin.是)
+                {
+                    <!--值班/登录记录-->
+                    <div class="record">
+                        <a class="record-text">
+                            <span class="iconfont icon-record"></span><span>记录</span>
+                        </a>
+                        <ul class="record-type">
+                            <li><a href="@Url.Action("index","dutylog")" style="display:inline-block;">值班记录</a></li>
+                            <li><a href="@Url.Action("index","log")" style="display:inline-block;">登录记录</a></li>
+                        </ul>
+                    </div>
+                }
+
+                @if (isLogin)
+                {
+                     <!--响应状态、值班-->
+                    <div class="response">
+                        <span class="response-text"><a class="iconfont icon-gear" href="javascript:void(0);"></a><a class="response-icon">响应状态：</a></span>
+                        <span class="response-val" data-status="1" data-id="">应急</span>
+                        <span style="margin-left:10px;display:none;" class="onduty-text">值班人员：</span>
+                        <span class="onduty-names"></span>
+                    </div>
+                }
+
+                <!--登录-->
+                <div class="login">
+                    <span>
+                        <a href="javascript:void(0);" class="loginBtn denglu" id="btnconf">登录</a>
+                    </span>
+                </div>
+
+
+                @if (isLogin)
+                {
+                    <!--值班-->
+                    <div class="punch" style="float:right;" data-dutyid="">
+                        <span class="iconfont icon-punchin"></span><span class="punchin-text">上班</span>
+                        <span class="iconfont icon-punchout"></span> <span class="punchout-text">下班</span>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="main">
+        @RenderBody()
+    </div>
+
+    <div class="footer">
+        <div class="footer-content auto">
+
+            <div class="content-one">
+                <span>本站所载文章、数据仅供参考，使用前请核实，风险自负。</span>
+                <span class="ml20">证劵投资咨询业务资格证书：ZX0069 </span>
+                <a target="_blank" class="font-color" href="http://jg.sac.net.cn/pages/publicity/investment-list.html">[证监会信息公示]</a>
+                <a target="_blank" class="font-color" href="http://person.sac.net.cn/pages/registration/sac-publicity-finish.html?aoiId=199030">[职业人员信息公示]</a>
+            </div>
+
+            <div class="content-two">
+                <p>
+                    上海证券之星综合研究有限公司<em>联系电话：021-50803180</em><span>投诉电话：021-38429864</span>
+                    <a class="font-color" href="http://www.szzy888.com/" style="margin:0px 10px">WWW.SZZY888.COM</a><em style=" margin-right:0">Copyright 2006-@(DateTime.Now.Year) </em>
+                    <span class=""><a class="font-color" href="http://www.miibeian.gov.cn/" target="_blank">沪ICP备07015607号</a></span>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div>
+        <input type="hidden" name="isLogin" value="@(Request.IsAuthenticated)" />
+        <input type="hidden" name="loginHeadPartialUrl" value="@Url.Action("LoginHeadPartial", "Home")" />
+        <input type="hidden" name="accountPartialUrl" value="@Url.Action("AccountPartial", "Home")" />
+        <input type="hidden" name="addDutyLogUrl" value="@Url.Action("Add", "DutyLog")" />
+        <input type="hidden" name="updateDutyStatusUrl" value="@Url.Action("UpdateDutyStatus", "DutyLog")" />
+        <input type="hidden" name="getUserDutyLogUrl" value="@Url.Action("GetUserDutyLog", "DutyLog")" />
+        <input type="hidden" name="getResponseStatusUrl" value="@Url.Action("GetResponseStatus", "Response")" />
+        <input type="hidden" name="editResponseUrl" value="@Url.Action("edit", "Response")" />
+        <input type="hidden" name="saveResponseUrl" value="@Url.Action("SaveResponse", "Response")" />
+    </div>
+    <script type="text/javascript" src="~/Content/js/layout.js"></script>
+
+    @RenderSection("scripts", false)
+</body>
+</html>

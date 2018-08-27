@@ -1,0 +1,34 @@
+﻿@using Wxb2018
+@{
+    WFFormPrincipal loginUser = User as WFFormPrincipal;
+    WFFormsAuthentication userInfo = loginUser == null ? new WFFormsAuthentication() : loginUser.UserData;
+}
+
+<div class="user-info">
+    <em class="info-title">欢迎您,</em>
+    <div class="info-name">
+        <a href="javascript:void(0);" class="acc_name">
+            <span>@(userInfo.TrueName)</span>
+        </a>
+        <ul class="info-account">
+            <li><a href="@(Url.Action("logout", "account", new { redirectUrl=Url.Action("login","account") }))">退出</a></li>
+        </ul>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    $(function () {
+
+
+        $('.info-name').hover(function () {
+
+            $('.user-info').css('background-color', '#333');
+            $('.info-account').show();
+        }, function () {
+            
+            $('.user-info').css('background-color', '#000');
+            $('.info-account').hide();
+        });
+    });
+</script>
